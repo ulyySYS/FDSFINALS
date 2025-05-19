@@ -1,41 +1,56 @@
-
 import { useAuth } from '../context/AuthContext';
+import { useState } from 'react';
 
-const AdminNavbar = ({ 
+const AdminSidebar = ({ 
   onDashboardClick, 
   onMaintenanceRequestClick, 
   onRegistrationClick, 
   onPaymentsClick,
 }) => {
   const { logout, currentUser } = useAuth();
+  const [collapsed, setCollapsed] = useState(false);
+
+  const toggleSidebar = () => {
+    setCollapsed(!collapsed);
+  };
 
   return (
-    <nav className="admin-navbar">
-      <div className="navbar-left">
-        <h2 className="navbar-brand">Admin Dashboard</h2>
-        <div className="navbar-buttons">
-          <button onClick={onDashboardClick} className="navbar-btn">
-            Dashboard
-          </button>
-          <button onClick={onMaintenanceRequestClick} className="navbar-btn">
-            Maintenance Requests
-          </button>
-          <button onClick={onRegistrationClick} className="navbar-btn">
-            Registration
-          </button>
-          <button onClick={onPaymentsClick} className="navbar-btn">
-            Payments
-          </button>
-        </div>
-      </div>
-      <div className="navbar-user">
-        <span className="navbar-welcome">Welcome, {currentUser?.UserName}</span>
-        <button onClick={logout} className="logout-btn">
-          Logout
+    <div className={`admin-sidebar ${collapsed ? 'collapsed' : ''}`}>
+      <div className="sidebar-header">
+        <button className="toggle-btn" onClick={toggleSidebar}>
+          {collapsed ? '→' : '←'}
         </button>
       </div>
-    </nav>
+      
+      <div className="sidebar-buttons">
+        <button onClick={onDashboardClick} className="sidebar-btn">
+          <span className="btn-icon">📊</span>
+          {!collapsed && <span className="btn-text">Dashboard</span>}
+        </button>
+        <button onClick={onMaintenanceRequestClick} className="sidebar-btn">
+          <span className="btn-icon">🔧</span>
+          {!collapsed && <span className="btn-text">Maintenance Requests</span>}
+        </button>
+        <button onClick={onRegistrationClick} className="sidebar-btn">
+          <span className="btn-icon">📝</span>
+          {!collapsed && <span className="btn-text">Registration</span>}
+        </button>
+        <button onClick={onPaymentsClick} className="sidebar-btn">
+          <span className="btn-icon">💰</span>
+          {!collapsed && <span className="btn-text">Payments</span>}
+        </button>
+      </div>
+      
+      <div className="sidebar-footer">
+        {!collapsed && (
+          <span className="navbar-welcome">Welcome, {currentUser?.UserName}</span>
+        )}
+        <button onClick={logout} className="logout-btn">
+          {collapsed ? '🚪' : 'Logout'}
+        </button>
+      </div>
+    </div>
   );
 };
 
-export default AdminNavbar;
+export default AdminSidebar;

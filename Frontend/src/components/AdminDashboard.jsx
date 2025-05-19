@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import AdminNavbar from './AdminNavbar';
 import { useAuth } from '../context/AuthContext';
@@ -8,7 +7,6 @@ import MaintenanceLogForm from './AdminMaintenanceLogForm';
 import RegistrationForm from './RegistrationForm';
 import RegistrationsList from './RegistrationsList';
 import PaymentForm from './PaymentForm';
-
 
 const AdminDashboard = () => {
   const { currentUser } = useAuth();
@@ -24,7 +22,6 @@ const AdminDashboard = () => {
   const [selectedRegistration, setSelectedRegistration] = useState(null);
   const [isLoadingRegistrations, setIsLoadingRegistrations] = useState(false);
   const [registrationsError, setRegistrationsError] = useState(null);
-
 
   //  state for user registrations combined view
   const [userRegistrations, setUserRegistrations] = useState([]);
@@ -196,7 +193,6 @@ const AdminDashboard = () => {
     }
   };
 
-
   // Handle request selection
   const handleRequestSelect = (request) => {
     setSelectedRequest(request);
@@ -207,8 +203,6 @@ const AdminDashboard = () => {
   const handleRegistrationSelect = (registration) => {
     setSelectedRegistration(registration);
   };
-
-
 
   // Handle form submission success
   const handleRequestSubmitted = () => {
@@ -229,9 +223,6 @@ const AdminDashboard = () => {
     fetchRegistrations();
   };
 
-  // Handle room update success
-
-
   // Handle closing the log form
   const handleCloseLogForm = () => {
     setShowLogForm(false);
@@ -249,7 +240,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="dashboard admin-dashboard">
+    <div className="ad-dashboard-layout">
       <AdminNavbar 
         onDashboardClick={() => setActiveView('dashboard')}
         onMaintenanceRequestClick={() => setActiveView('maintenance')}
@@ -258,377 +249,360 @@ const AdminDashboard = () => {
         onRoomsClick={() => setActiveView('rooms')}
       />
       
-      <div className="dashboard-container">
-        {activeView === 'dashboard' ? (
-          // Dashboard View
-          <>
-            <h3 className="dashboard-title">Admin Dashboard</h3>
-            <div className="dashboard-card">
-              <h4 className="card-title">User Information</h4>
-              <div className="info-grid">
-                <div className="info-item">
-                  <p className="info-label">Full Name</p>
-                  <p className="info-value">{currentUser?.UserName}</p>
+      <div className="ad-dashboard-content">
+        <div className="ad-dashboard-header">
+          {activeView === 'dashboard' && <h2 className="ad-dashboard-page-title">Admin Dashboard</h2>}
+          {activeView === 'maintenance' && <h2 className="ad-dashboard-page-title">Maintenance Requests</h2>}
+          {activeView === 'registration' && <h2 className="ad-dashboard-page-title">User Registration</h2>}
+          {activeView === 'payments' && <h2 className="ad-dashboard-page-title">Payment Management</h2>}
+          {activeView === 'userRegistration' && <h2 className="ad-dashboard-page-title">User Registration List</h2>}
+          {activeView === 'allPayments' && <h2 className="ad-dashboard-page-title">Payment List</h2>}
+          {activeView === 'maintenanceLogs' && <h2 className="ad-dashboard-page-title">Maintenance Logs</h2>}
+          {activeView === 'maintenanceRequests' && <h2 className="ad-dashboard-page-title">Maintenance Requests</h2>}
+          {activeView === 'buildings' && <h2 className="ad-dashboard-page-title">Dorm Buildings</h2>}
+        </div>
+        
+        <div className="ad-dashboard-main">
+          {activeView === 'dashboard' ? (
+            // Dashboard View
+            <div className="ad-dashboard-home">
+              <div className="ad-dashboard-card">
+                <h4 className="ad-dashboard-card-title">User Information</h4>
+                <div className="info-grid">
+                  <div className="info-item">
+                    <p className="info-label">Full Name</p>
+                    <p className="info-value">{currentUser?.UserName}</p>
+                  </div>
+                  <div className="info-item">
+                    <p className="info-label">Email Address</p>
+                    <p className="info-value">{currentUser?.Email}</p>
+                  </div>
+                  <div className="info-item">
+                    <p className="info-label">Contact Number</p>
+                    <p className="info-value">{currentUser?.ContactNumber}</p>
+                  </div>
+                  <div className="info-item">
+                    <p className="info-label">User Role</p>
+                    <p className="role-badge">{currentUser?.Role}</p>
+                  </div>
                 </div>
-                <div className="info-item">
-                  <p className="info-label">Email Address</p>
-                  <p className="info-value">{currentUser?.Email}</p>
-                </div>
-                <div className="info-item">
-                  <p className="info-label">Contact Number</p>
-                  <p className="info-value">{currentUser?.ContactNumber}</p>
-                </div>
-                <div className="info-item">
-                  <p className="info-label">User Role</p>
-                  <p className="role-badge">{currentUser?.Role}</p>
-                </div>
-              </div>
-            </div>
-            
-      
-            <div className="table-data-button-container">
-              <button 
-                className="table-data-button" 
-                onClick={() => setActiveView('userRegistration')}
-              >
-                User Registration
-              </button>
-              <button 
-                className="table-data-button" 
-                onClick={() => setActiveView('allPayments')}
-              >
-                Payments
-              </button>
-              <button 
-                className="table-data-button"
-                onClick={() => setActiveView('maintenanceLogs')}
-              >
-                Maintenance Logs
-              </button>
-              <button 
-                className="table-data-button"
-                onClick={() => setActiveView('maintenanceRequests')}
-              >
-                Maintenance Requests
-              </button>
-              <button 
-                className="table-data-button"
-                onClick={() => setActiveView('buildings')}
-              >
-                Dorm Buildings
-              </button>
-            </div>
-          </>
-        ) : activeView === 'maintenance' ? (
-          // Maintenance View
-          <>
-            <h3 className="dashboard-title">Maintenance Requests</h3>
-            <div className="maintenance-container">
-              {/* List of maintenance requests on the left */}
-              <div className="maintenance-list-container">
-                {isLoading ? (
-                  <p className="loading-text">Loading requests...</p>
-                ) : error ? (
-                  <p className="error-text">{error}</p>
-                ) : (
-                  <MaintenanceRequestList 
-                    requests={maintenanceRequests} 
-                    onSelectRequest={handleRequestSelect}
-                    selectedRequest={selectedRequest}
-                  />
-                )}
               </div>
               
-              {/* Forms containers */}
-              <div className="maintenance-forms-container">
-                {showLogForm && selectedRequest ? (
-                  <MaintenanceLogForm 
-                    selectedRequest={selectedRequest}
-                    onLogSubmitted={handleLogSubmitted}
-                    onClose={handleCloseLogForm}
-                  />
-                ) : (
-                  <AdminMaintenanceRequestForm 
+              <div className="ad-dashboard-quick-actions">
+                <h4 className="ad-dashboard-card-title">Quick Access</h4>
+                <div className="ad-dashboard-actions-grid">
+                  <button 
+                    className="ad-dashboard-action-button" 
+                    onClick={() => setActiveView('userRegistration')}
+                  >
+                    User Registration
+                  </button>
+                  <button 
+                    className="ad-dashboard-action-button" 
+                    onClick={() => setActiveView('allPayments')}
+                  >
+                    Payments
+                  </button>
+                  <button 
+                    className="ad-dashboard-action-button"
+                    onClick={() => setActiveView('maintenanceLogs')}
+                  >
+                    Maintenance Logs
+                  </button>
+                  <button 
+                    className="ad-dashboard-action-button"
+                    onClick={() => setActiveView('maintenanceRequests')}
+                  >
+                    Maintenance Requests
+                  </button>
+                  <button 
+                    className="ad-dashboard-action-button"
+                    onClick={() => setActiveView('buildings')}
+                  >
+                    Dorm Buildings
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : activeView === 'maintenance' ? (
+            // Maintenance View
+            <div className="ad-dashboard-section">
+              <div className="ad-dashboard-maintenance-container">
+                {/* List of maintenance requests */}
+                <div className="ad-dashboard-list-section">
+                  {isLoading ? (
+                    <p className="ad-dashboard-loading">Loading requests...</p>
+                  ) : error ? (
+                    <p className="ad-dashboard-error">{error}</p>
+                  ) : (
+                    <MaintenanceRequestList 
+                      requests={maintenanceRequests} 
+                      onSelectRequest={handleRequestSelect}
+                      selectedRequest={selectedRequest}
+                    />
+                  )}
+                </div>
+                
+                {/* Forms container */}
+                <div className="ad-dashboard-form-section">
+                  {showLogForm && selectedRequest ? (
+                    <MaintenanceLogForm 
+                      selectedRequest={selectedRequest}
+                      onLogSubmitted={handleLogSubmitted}
+                      onClose={handleCloseLogForm}
+                    />
+                  ) : (
+                    <AdminMaintenanceRequestForm 
+                      currentUser={currentUser}
+                      onRequestSubmitted={handleRequestSubmitted}
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : activeView === 'registration' ? (
+            // Registration View
+            <div className="ad-dashboard-section">
+              <RegistrationForm currentUser={currentUser} />
+            </div>
+          ) : activeView === 'payments' ? (
+            // Payments View
+            <div className="ad-dashboard-section">
+              <div className="ad-dashboard-payment-container">
+                {/* List of registrations */}
+                <div className="ad-dashboard-list-section">
+                  {isLoadingRegistrations ? (
+                    <p className="ad-dashboard-loading">Loading registrations...</p>
+                  ) : registrationsError ? (
+                    <p className="ad-dashboard-error">{registrationsError}</p>
+                  ) : (
+                    <RegistrationsList 
+                      registrations={registrations}
+                      onSelectRegistration={handleRegistrationSelect}
+                      selectedRegistration={selectedRegistration}
+                    />
+                  )}
+                </div>
+                
+                {/* Payment form */}
+                <div className="ad-dashboard-form-section">
+                  <PaymentForm 
                     currentUser={currentUser}
-                    onRequestSubmitted={handleRequestSubmitted}
-                  />
-                )}
-              </div>
-            </div>
-          </>
-        ) : activeView === 'registration' ? (
-          // Registration View
-          <>
-            <h3 className="dashboard-title">User Registration</h3>
-            <RegistrationForm currentUser={currentUser} />
-          </>
-        ) : activeView === 'payments' ? (
-          // Payments View
-          <>
-            <h3 className="dashboard-title">Payment Management</h3>
-            <div className="payment-container">
-              {/* List of registrations on the left */}
-              <div className="payment-list-container">
-                {isLoadingRegistrations ? (
-                  <p className="payment-loading-text">Loading registrations...</p>
-                ) : registrationsError ? (
-                  <p className="payment-error-text">{registrationsError}</p>
-                ) : (
-                  <RegistrationsList 
-                    registrations={registrations}
-                    onSelectRegistration={handleRegistrationSelect}
                     selectedRegistration={selectedRegistration}
+                    onPaymentSubmitted={handlePaymentSubmitted}
                   />
+                </div>
+              </div>
+            </div>
+          ) : activeView === 'userRegistration' || 
+              activeView === 'allPayments' || 
+              activeView === 'maintenanceLogs' || 
+              activeView === 'maintenanceRequests' || 
+              activeView === 'buildings' ? (
+            // Table Views (common layout for all table views)
+            <div className="ad-dashboard-section">
+              <div className="ad-dashboard-table-container">
+                <button 
+                  className="ad-dashboard-back-button" 
+                  onClick={() => setActiveView('dashboard')}
+                >
+                  Back to Dashboard
+                </button>
+                
+                {activeView === 'userRegistration' && (
+                  <>
+                    {isLoadingUserRegistrations ? (
+                      <p className="ad-dashboard-loading">Loading user registrations...</p>
+                    ) : userRegistrationsError ? (
+                      <p className="ad-dashboard-error">{userRegistrationsError}</p>
+                    ) : (
+                      <div className="ad-dashboard-table-wrapper">
+                        <table className="ad-dashboard-table">
+                          <thead>
+                            <tr>
+                              <th>Reg. ID</th>
+                              <th>User ID</th>
+                              <th>Room ID</th>
+                              <th>User Name</th>
+                              <th>Contact Number</th>
+                              <th>Email</th>
+                              <th>Start Date</th>
+                              <th>End Date</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {userRegistrations.map((reg) => (
+                              <tr key={reg.RegistrationID}>
+                                <td>{reg.RegistrationID}</td>
+                                <td>{reg.UserID}</td>
+                                <td>{reg.RoomID}</td>
+                                <td>{reg.UserName}</td>
+                                <td>{reg.ContactNumber}</td>
+                                <td>{reg.Email}</td>
+                                <td>{formatDate(reg.StartDate)}</td>
+                                <td>{formatDate(reg.EndDate)}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </>
+                )}
+                
+                {activeView === 'allPayments' && (
+                  <>
+                    {isLoadingPayments ? (
+                      <p className="ad-dashboard-loading">Loading payments...</p>
+                    ) : paymentsError ? (
+                      <p className="ad-dashboard-error">{paymentsError}</p>
+                    ) : (
+                      <div className="ad-dashboard-table-wrapper">
+                        <table className="ad-dashboard-table">
+                          <thead>
+                            <tr>
+                              <th>Registration ID</th>
+                              <th>User Name</th>
+                              <th>Contact Number</th>
+                              <th>Email</th>
+                              <th>Payment Date</th>
+                              <th>Amount</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {allPayments.map((payment, index) => (
+                              <tr key={index}>
+                                <td>{payment.RegistrationID}</td>
+                                <td>{payment.UserName}</td>
+                                <td>{payment.ContactNumber}</td>
+                                <td>{payment.Email}</td>
+                                <td>{formatDate(payment.PaymentDate)}</td>
+                                <td>₱{parseFloat(payment.Amount).toFixed(2)}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </>
+                )}
+                
+                {activeView === 'maintenanceLogs' && (
+                  <>
+                    {isLoadingLogs ? (
+                      <p className="ad-dashboard-loading">Loading maintenance logs...</p>
+                    ) : logsError ? (
+                      <p className="ad-dashboard-error">{logsError}</p>
+                    ) : (
+                      <div className="ad-dashboard-table-wrapper">
+                        <table className="ad-dashboard-table">
+                          <thead>
+                            <tr>
+                              <th>Log ID</th>
+                              <th>Request ID</th>
+                              <th>Log Date</th>
+                              <th>Repair Description</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {maintenanceLogs.map((log) => (
+                              <tr key={log.MaintenanceLogs}>
+                                <td>{log.MaintenanceLogs}</td>
+                                <td>{log.RequestID}</td>
+                                <td>{formatDate(log.LogDate)}</td>
+                                <td>{log.RepairDescription}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </>
+                )}
+                
+                {activeView === 'maintenanceRequests' && (
+                  <>
+                    {isLoading ? (
+                      <p className="ad-dashboard-loading">Loading maintenance requests...</p>
+                    ) : error ? (
+                      <p className="ad-dashboard-error">{error}</p>
+                    ) : (
+                      <div className="ad-dashboard-table-wrapper">
+                        <table className="ad-dashboard-table">
+                          <thead>
+                            <tr>
+                              <th>Request ID</th>
+                              <th>Room ID</th>
+                              <th>Room Name</th>
+                              <th>User ID</th>
+                              <th>Username</th>
+                              <th>Issue</th>
+                              <th>Status</th>
+                              <th>Date</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {maintenanceRequests.map((request) => (
+                              <tr key={request.RequestID}>
+                                <td>{request.RequestID}</td>
+                                <td>{request.RoomID}</td>
+                                <td>{request.RoomName}</td>
+                                <td>{request.UserID}</td>
+                                <td>{request.Username}</td>
+                                <td>{request.RequestDetails}</td>
+                                <td>
+                                  <span className={`ad-dashboard-status ad-dashboard-status-${request.Status.toLowerCase()}`}>
+                                    {request.Status}
+                                  </span>
+                                </td>
+                                <td>{formatDate(request.Date)}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </>
+                )}
+                
+                {activeView === 'buildings' && (
+                  <>
+                    {isLoadingBuildings ? (
+                      <p className="ad-dashboard-loading">Loading buildings...</p>
+                    ) : buildingsError ? (
+                      <p className="ad-dashboard-error">{buildingsError}</p>
+                    ) : (
+                      <div className="ad-dashboard-table-wrapper">
+                        <table className="ad-dashboard-table">
+                          <thead>
+                            <tr>
+                              <th>Building ID</th>
+                              <th>Building Name</th>
+                              <th>Address</th>
+                              <th>Total Rooms</th>
+                              <th>Available Rooms</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {buildings.map((building) => (
+                              <tr key={building.DormBuildingID}>
+                                <td>{building.DormBuildingID}</td>
+                                <td>{building.BuildingName}</td>
+                                <td>{building.Address}</td>
+                                <td>{building.TotalRooms}</td>
+                                <td>{building.AvailableRooms}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
-              
-              {/* Payment form on the right */}
-              <div className="payment-form-container">
-                <PaymentForm 
-                  currentUser={currentUser}
-                  selectedRegistration={selectedRegistration}
-                  onPaymentSubmitted={handlePaymentSubmitted}
-                />
-              </div>
             </div>
-          </>
-        ) : activeView === 'userRegistration' ? (
-          // User Registration List View
-          <>
-            <h3 className="dashboard-title">User Registration List</h3>
-            <div className="table-data-container">
-              <button 
-                className="table-data-back-button" 
-                onClick={() => setActiveView('dashboard')}
-              >
-                Back to Dashboard
-              </button>
-              
-              {isLoadingUserRegistrations ? (
-                <p className="table-data-loading">Loading user registrations...</p>
-              ) : userRegistrationsError ? (
-                <p className="table-data-error">{userRegistrationsError}</p>
-              ) : (
-                <div className="table-data-wrapper">
-                  <table className="table-data-table">
-                    <thead>
-                      <tr>
-                        <th>Reg. ID</th>
-                        <th>User ID</th>
-                        <th>Room ID</th>
-                        <th>User Name</th>
-                        <th>Contact Number</th>
-                        <th>Email</th>
-                        <th>Start Date</th>
-                        <th>End Date</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {userRegistrations.map((reg) => (
-                        <tr key={reg.RegistrationID}>
-                          <td>{reg.RegistrationID}</td>
-                          <td>{reg.UserID}</td>
-                          <td>{reg.RoomID}</td>
-                          <td>{reg.UserName}</td>
-                          <td>{reg.ContactNumber}</td>
-                          <td>{reg.Email}</td>
-                          <td>{formatDate(reg.StartDate)}</td>
-                          <td>{formatDate(reg.EndDate)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          </>
-        ) : activeView === 'allPayments' ? (
-          // All Payments View
-          <>
-            <h3 className="dashboard-title">Payment List</h3>
-            <div className="table-data-container">
-              <button 
-                className="table-data-back-button" 
-                onClick={() => setActiveView('dashboard')}
-              >
-                Back to Dashboard
-              </button>
-              
-              {isLoadingPayments ? (
-                <p className="table-data-loading">Loading payments...</p>
-              ) : paymentsError ? (
-                <p className="table-data-error">{paymentsError}</p>
-              ) : (
-                <div className="table-data-wrapper">
-                  <table className="table-data-table">
-                    <thead>
-                      <tr>
-                        <th>Registration ID</th>
-                        <th>User Name</th>
-                        <th>Contact Number</th>
-                        <th>Email</th>
-                        <th>Payment Date</th>
-                        <th>Amount</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {allPayments.map((payment, index) => (
-                        <tr key={index}>
-                          <td>{payment.RegistrationID}</td>
-                          <td>{payment.UserName}</td>
-                          <td>{payment.ContactNumber}</td>
-                          <td>{payment.Email}</td>
-                          <td>{formatDate(payment.PaymentDate)}</td>
-                          <td>₱{parseFloat(payment.Amount).toFixed(2)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          </>
-        ) : activeView === 'maintenanceLogs' ? (
-          // Maintenance Logs View
-          <>
-            <h3 className="dashboard-title">Maintenance Logs</h3>
-            <div className="table-data-container">
-              <button 
-                className="table-data-back-button" 
-                onClick={() => setActiveView('dashboard')}
-              >
-                Back to Dashboard
-              </button>
-              
-              {isLoadingLogs ? (
-                <p className="table-data-loading">Loading maintenance logs...</p>
-              ) : logsError ? (
-                <p className="table-data-error">{logsError}</p>
-              ) : (
-                <div className="table-data-wrapper">
-                  <table className="table-data-table">
-                    <thead>
-                      <tr>
-                        <th>Log ID</th>
-                        <th>Request ID</th>
-                        <th>Log Date</th>
-                        <th>Repair Description</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {maintenanceLogs.map((log) => (
-                        <tr key={log.MaintenanceLogs}>
-                          <td>{log.MaintenanceLogs}</td>
-                          <td>{log.RequestID}</td>
-                          <td>{formatDate(log.LogDate)}</td>
-                          <td>{log.RepairDescription}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          </>
-        ) : activeView === 'maintenanceRequests' ? (
-          // Maintenance Requests View
-          <>
-            <h3 className="dashboard-title">Maintenance Requests</h3>
-            <div className="table-data-container">
-              <button 
-                className="table-data-back-button" 
-                onClick={() => setActiveView('dashboard')}
-              >
-                Back to Dashboard
-              </button>
-              
-              {isLoading ? (
-                <p className="table-data-loading">Loading maintenance requests...</p>
-              ) : error ? (
-                <p className="table-data-error">{error}</p>
-              ) : (
-                <div className="table-data-wrapper">
-                  <table className="table-data-table">
-                    <thead>
-                      <tr>
-                        <th>Request ID</th>
-                        <th>Room ID</th>
-                        <th>Room Name</th>
-                        <th>User ID</th>
-                        <th>Username</th>
-                        <th>Issue</th>
-                        <th>Status</th>
-                        <th>Date</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {maintenanceRequests.map((request) => (
-                        <tr key={request.RequestID}>
-                          <td>{request.RequestID}</td>
-                          <td>{request.RoomID}</td>
-                          <td>{request.RoomName}</td>
-                          <td>{request.UserID}</td>
-                          <td>{request.Username}</td>
-                          <td>{request.RequestDetails}</td>
-                          <td>
-                            <span className={`table-data-status table-data-status-${request.Status.toLowerCase()}`}>
-                              {request.Status}
-                            </span>
-                          </td>
-                          <td>{formatDate(request.Date)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          </>
-        ) : activeView === 'buildings' ? (
-          // Buildings View
-          <>
-            <h3 className="dashboard-title">Dorm Buildings</h3>
-            <div className="table-data-container">
-              <button 
-                className="table-data-back-button" 
-                onClick={() => setActiveView('dashboard')}
-              >
-                Back to Dashboard
-              </button>
-              
-              {isLoadingBuildings ? (
-                <p className="table-data-loading">Loading buildings...</p>
-              ) : buildingsError ? (
-                <p className="table-data-error">{buildingsError}</p>
-              ) : (
-                <div className="table-data-wrapper">
-                  <table className="table-data-table">
-                    <thead>
-                      <tr>
-                        <th>Building ID</th>
-                        <th>Building Name</th>
-                        <th>Address</th>
-                        <th>Total Rooms</th>
-                        <th>Available Rooms</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {buildings.map((building) => (
-                        <tr key={building.DormBuildingID}>
-                          <td>{building.DormBuildingID}</td>
-                          <td>{building.BuildingName}</td>
-                          <td>{building.Address}</td>
-                          <td>{building.TotalRooms}</td>
-                          <td>{building.AvailableRooms}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          </>
-        ) : null}
+          ) : null}
+        </div>
       </div>
     </div>
   );
