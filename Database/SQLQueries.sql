@@ -1,245 +1,264 @@
-create database University_Dormitory;
 
-use University_Dormitory;
 
-create table Users(
-	UserID int auto_increment primary key,
-    UserName varchar(255) not null,
-    Role enum("student", "admin") not null,
-    ContactNumber varchar(255) not null,
-    Email varchar(255) not null unique,
-    Password varchar(255) not null
+CREATE DATABASE dormitory_management_system;
+USE dormitory_management_system;
+
+CREATE TABLE Users (
+    UserID INT AUTO_INCREMENT PRIMARY KEY,
+    UserName VARCHAR(255),
+    Role ENUM('student', 'admin'),
+    ContactNumber VARCHAR(255) UNIQUE,
+    Email VARCHAR(255) UNIQUE,
+    Password VARCHAR(255)
 );
 
-
-create table User_Creation_Logs(
-	Log_ID int auto_increment primary key,
-    UserID int not null,
-	UserName Varchar(255) not null,
-    Log_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-    Foreign key (UserID) references Users(UserID)
+CREATE TABLE Dorms (
+    DormID INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(255),
+    Address VARCHAR(255),
+    TotalRooms INT
 );
 
-create table Registrations (
-	RegistrationID int auto_increment primary key,
-    UserID int not null, 
-    RoomID int not null,
-    StartDate date not null, 
-    EndDate date not null, 
-    AdminID int not null,
-    foreign key (UserID) references Users(UserID),
-    foreign key(RoomId) references Rooms(RoomID),
-    foreign key (AdminID) references Users(UserID)
+CREATE TABLE DormRooms (
+    RoomID INT AUTO_INCREMENT PRIMARY KEY,
+    DormBuildingID INT,
+    Occupied BOOLEAN,
+    FOREIGN KEY (DormBuildingID) REFERENCES Dorms(DormID) ON DELETE SET NULL
 );
 
-create table Payments(
-	PaymentId int auto_increment primary key,
-    RegistrationID int not null,
-	AdminId int not null,
-    PaymentDate DATETIME not null,
-    Amount Decimal(10,2),
-    foreign key (RegistrationID) references Registrations(RegistrationID),
-    foreign key (AdminID) references Users(UserID)
+CREATE TABLE Registrations (
+    RegisID INT AUTO_INCREMENT PRIMARY KEY,
+    UserID INT,
+    RoomID INT,
+    StartDate DATE,
+    EndDate DATE,
+    AdminID INT,
+    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE SET NULL,
+    FOREIGN KEY (RoomID) REFERENCES DormRooms(RoomID) ON DELETE SET NULL
 );
 
-create table DormBuildings(
-	DormBuildingID int auto_increment primary key,
-    BuildingName varchar(255) not null unique,
-    Address varchar(255) not null,
-    TotalRooms int not null,
-    AvailableRooms int not null
+CREATE TABLE Registration_Created_At (
+    RegisCreationID INT AUTO_INCREMENT PRIMARY KEY,
+    RegistrationID INT,
+    Date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (RegistrationID) REFERENCES Registrations(RegisID) ON DELETE SET NULL
 );
 
-create table Rooms(
-	RoomID int auto_increment primary key,
-    DormBuildingID int not null,
-    Capacity int not null, 
-    isOperational bool not null,
-    RoomName varchar(255) not null unique,
-    foreign key (DormBuildingID) references DormBuildings(DormBuildingID)
+CREATE TABLE Payments (
+    PaymentID INT AUTO_INCREMENT PRIMARY KEY,
+    AdminID INT,
+    RegisID INT,
+    Date DATETIME,
+    Amount DECIMAL(10,2),
+    FOREIGN KEY (AdminID) REFERENCES Users(UserID) ON DELETE SET NULL,
+    FOREIGN KEY (RegisID) REFERENCES Registrations(RegisID) ON DELETE SET NULL
 );
 
+CREATE TABLE Payment_Created_At (
+    PaymentCreationID int AUTO_INCREMENT PRIMARY KEY,
+    RegistrationID INT,
+    Date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (RegistrationID) REFERENCES Registrations(RegisID) ON DELETE SET NULL
+);
 
+CREATE TABLE UserLoginLogs (
+    LoginID INT AUTO_INCREMENT PRIMARY KEY,
+    UserID INT,
+    Date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE SET NULL
+);
 
-create table MaintenanceRequests(
-	RequestId int auto_increment primary key,
-    RoomID int not null,
-    UserID int not null, 
-    Issue TEXT not null,
-    Date datetime DEFAULT CURRENT_TIMESTAMP,
-    Status enum("fixed", "not_fixed") not null,
+CREATE TABLE MaintenanceRequests (
+    RequestID INT AUTO_INCREMENT PRIMARY KEY,
+    RoomID INT,
+    UserID INT,
+    RequestDetails VARCHAR(255),
+    Date DATETime DEFAULT current_timestamp,
+    Status ENUM('fixed', 'not_fixed'),
     DateFixed DATETIME,
-    foreign key (RoomID) references Rooms(RoomID),
-    foreign key (UserID) references Users(UserID)
-);
-
-create table MaintenanceLogs(
-	MaintenanceLogs int auto_increment primary key,
-    RequestID int not null,
-    LogDate	datetime DEFAULT CURRENT_TIMESTAMP,
-    RepairDescription TEXT not null
+    FOREIGN KEY (RoomID) REFERENCES DormRooms(RoomID) ON DELETE SET NULL,
+    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE SET NULL
 );
 
 
 
-
-Insert into users(UserName, Role, ContactNumber, Email, Password) 
-values("Edmar Jhon", "admin", 09458149345, "EJ@gmail.com", "Pass1");
-    
-Insert into users(UserName, Role, ContactNumber, Email, Password) 
-values("Lowie Sumatra", "admin", 09455432145, "LS@gmail.com", "pass2");
-
-Insert into users(UserName, Role, ContactNumber, Email, Password) 
-values("Randy Cunatan", "admin", 09098762145, "RC@gmail.com", "Pass3");
-
-INSERT INTO Users (UserName, Role, ContactNumber, Email, Password) VALUES
-('Alice Ramos', 'student', '09171234567', 'alice.ramos@example.com', "Pass1"),
-('Ben Cruz', 'student', '09181234567', 'ben.cruz@example.com', "Pass1"),
-('Carla Santos', 'student', '09191234567', 'carla.santos@example.com', "Pass1"),
-('David Reyes', 'student', '09201234567', 'david.reyes@example.com', "pass2"),
-('Ella Lim', 'student', '09211234567', 'ella.lim@example.com', "pass2"),
-('Francis Dela Cruz', 'student', '09221234567', 'francis.dc@example.com', "pass2"),
-('Grace Tan', 'student', '09231234567', 'grace.tan@example.com', "Pass3"),
-('Henry Yu', 'student', '09241234567', 'henry.yu@example.com', "Pass3"),
-('Isla Gomez', 'student', '09251234567', 'isla.gomez@example.com', "Pass3"),
-('Jake Navarro', 'student', '09261234567', 'jake.navarro@example.com', "Pass1"),
-('Kyla Bautista', 'student', '09271234567', 'kyla.bautista@example.com', "pass2"),
-('Liam Mendoza', 'student', '09281234567', 'liam.mendoza@example.com', "Pass3");
-
-
-Insert into DormBuildings(BuildingName, Address, TotalRooms, AvailableRooms)
-values ("Magsaysay Bld", "Jacinto Street, Davao City", 10, 10);
-
-Insert into DormBuildings(BuildingName, Address, TotalRooms, AvailableRooms)
-values ("Aguinaldo Bld", "Jacinto Street, Davao City", 10, 10);
-
-Insert into DormBuildings(BuildingName, Address, TotalRooms, AvailableRooms)
-values ("Quirino Bld", "Jacinto Street, Davao City", 10, 10);
-
-select * from Rooms;
-Insert into Rooms(DormBuildingID, Capacity, isOperational, RoomName) 
-values(1, 1, 1, "Magsaysay Admin Room");
-Insert into Rooms(DormBuildingID, Capacity, isOperational, RoomName) 
-values(2, 1, 1, "Aguinaldo Admin Room");
-Insert into Rooms(DormBuildingID, Capacity, isOperational, RoomName) 
-values(3, 1, 1, "Quirino Admin Room");
-
-
-INSERT INTO Rooms (DormBuildingID, Capacity, isOperational, RoomName) VALUES
--- DormBuildingID 1
-(1, 2, TRUE, 'M101'),
-(1, 1, TRUE, 'M102'),
-(1, 2, TRUE, 'M103'),
-(1, 2, True, 'M104'),
-(1, 1, TRUE, 'M105'),
--- second floor
-(1, 2, TRUE, 'M206'),
-(1, 3, TRUE, 'M207'),
-(1, 1, TRUE, 'M208'),
-(1, 2, TRUE, 'M209'),
-(1, 2, TRUE, 'M210'),
-
--- DormBuildingID 2
-(2, 2, TRUE, 'A101'),
-(2, 1, TRUE, 'A102'),
-(2, 2, TRUE, 'A103'),
-(2, 2, TRUE, 'A104'),
-(2, 1, TRUE, 'A105'),
--- second floor
-(2, 2, TRUE, 'A206'),
-(2, 3, TRUE, 'A207'),
-(2, 1, TRUE, 'A208'),
-(2, 2, TRUE, 'A209'),
-(2, 2, TRUE, 'A210'),
-
--- DormBuildingID 3
-(3, 2, TRUE, 'Q101'),
-(3, 1, TRUE, 'Q102'),
-(3, 2, TRUE, 'Q103'),
-(3, 1, TRUE, 'Q104'),
-(3, 2, TRUE, 'Q105'),
--- second floor of the building
-(3, 2, TRUE, 'Q206'),
-(3, 3, TRUE, 'Q207'),
-(3, 1, TRUE, 'Q208'),
-(3, 2, TRUE, 'Q209'),
-(3, 2, TRUE, 'Q210');
-
-
-
-INSERT INTO Registrations (UserID, RoomID, StartDate, EndDate, AdminID) VALUES
-(4, 4, '2025-06-01', '2026-05-31', 1),   -- Alice Ramos in M101
-(5, 5, '2025-06-01', '2026-05-31', 1),   -- Ben Cruz in M102
-(6, 6, '2025-06-01', '2026-05-31', 1),   -- Carla Santos in M103
-(7, 7, '2025-06-01', '2026-05-31', 1),   -- David Reyes in M104
-(8, 8, '2025-06-01', '2026-05-31', 1),   -- Ella Lim in M105
-(9, 9, '2025-06-01', '2026-05-31', 1),  -- Francis Dela Cruz in M206
-(10, 10, '2025-06-01', '2026-05-31', 1),  -- Grace Tan in M207
-(11, 11, '2025-06-01', '2026-05-31', 1),  -- Henry Yu in M208
-(12, 14, '2025-06-01', '2026-05-31', 2),  -- Isla Gomez in A101
-(13, 15, '2025-06-01', '2026-05-31',2), -- Jake Navarro in A102
-(14, 24, '2025-06-01', '2026-05-31', 3), -- Kyla Bautista in Q101
-(15, 25, '2025-06-01', '2026-05-31', 3); -- Liam Mendoza in Q102
-
-
+select * from MaintenanceLogs;
+CREATE TABLE MaintenanceLogs (
+    LogID INT AUTO_INCREMENT PRIMARY KEY,
+    RequestID INT,
+    FixDetails TEXT,
+    Date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (RequestID) REFERENCES MaintenanceRequests(RequestID) ON DELETE SET NULL
+);
 
 DELIMITER $$
 
-CREATE TRIGGER UpdateRequestStatusAfterLog
+CREATE TRIGGER after_registration_insert
+AFTER INSERT ON Registrations
+FOR EACH ROW
+BEGIN
+    INSERT INTO Registration_Created_At (RegistrationID, Date)
+    VALUES (NEW.RegisID, NOW());
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER after_maintenance_log_insert
 AFTER INSERT ON MaintenanceLogs
 FOR EACH ROW
 BEGIN
-  UPDATE MaintenanceRequests
-  SET Status = 'fixed',
-      DateFixed = NOW()
-  WHERE RequestID = NEW.RequestID;
+    UPDATE MaintenanceRequests
+    SET Status = 'fixed'
+    WHERE RequestID = NEW.RequestID;
 END$$
 
 DELIMITER ;
 
 DELIMITER $$
 
-CREATE TRIGGER LogUserCreation
-AFTER INSERT ON Users
+CREATE TRIGGER set_room_occupied_on_registration
+AFTER INSERT ON Registrations
 FOR EACH ROW
 BEGIN
-  INSERT INTO User_Creation_Logs (UserID, UserName)
-  VALUES (NEW.UserID, NEW.UserName);
-END$$
+    UPDATE DormRooms
+    SET Occupied = TRUE
+    WHERE RoomID = NEW.RoomID;
+END $$
 
 DELIMITER ;
 
 DELIMITER $$
 
-CREATE TRIGGER UpdateTotalRoomsAvailable
-AFTER UPDATE ON Rooms
+CREATE TRIGGER log_payment_creation
+AFTER INSERT ON Payments
 FOR EACH ROW
 BEGIN
-  -- If operational status changed from true to false, subtract 1
-  IF OLD.isOperational = TRUE AND NEW.isOperational = FALSE THEN
-    UPDATE DormBuildings
-    SET AvailableRooms = AvailableRooms - 1
-    WHERE DormBuildingID = NEW.DormBuildingID;
-
-  -- If operational status changed from false to true, add 1
-  ELSEIF OLD.isOperational = FALSE AND NEW.isOperational = TRUE THEN
-    UPDATE DormBuildings
-    SET AvailableRooms = AvailableRooms + 1
-    WHERE DormBuildingID = NEW.DormBuildingID;
-  END IF;
-END$$
+    INSERT INTO Payment_Created_At (RegistrationID, Date)
+    VALUES (NEW.RegisID, NOW());
+END $$
 
 DELIMITER ;
 
+
+
+
+INSERT INTO Dorms (DormID, Name, Address, TotalRooms)
+VALUES
+    (1, 'Maple Hall', '123 University Ave', 100),
+    (2, 'Oak Hall', '456 College Blvd', 80),
+    (3, 'Pine Hall', '789 Campus Drive', 120);
+    
+-- Rooms for DormID 1 (Maple Hall)
+INSERT INTO DormRooms (DormBuildingID, Occupied)
+VALUES
+(1, FALSE), (1, FALSE), (1, FALSE), (1, FALSE), (1, FALSE),
+(1, FALSE), (1, FALSE), (1, FALSE), (1, FALSE), (1, FALSE);
+
+-- Rooms for DormID 2 (Oak Hall)
+INSERT INTO DormRooms (DormBuildingID, Occupied)
+VALUES
+(2, FALSE), (2, FALSE), (2, FALSE), (2, FALSE), (2, FALSE),
+(2, FALSE), (2, FALSE), (2, FALSE), (2, FALSE), (2, FALSE);
+
+-- Rooms for DormID 3 (Pine Hall)
+INSERT INTO DormRooms (DormBuildingID, Occupied)
+VALUES
+(3, FALSE), (3, FALSE), (3, FALSE), (3, FALSE), (3, FALSE),
+(3, FALSE), (3, FALSE), (3, FALSE), (3, FALSE), (3, FALSE);
+
+INSERT INTO Users (UserName, Role, ContactNumber, Email, Password)
+VALUES ('AdminUser1', 'admin', '1234567890', 'admin@example.com', 'password123');
+INSERT INTO Registrations (UserID, RoomID, StartDate, EndDate, AdminID)
+VALUES (1, 1, '2025-06-01', '2025-12-01', 1);
+
+
+INSERT INTO Users (UserName, Role, ContactNumber, Email, Password) VALUES
+-- Maple Hall
+('Alice Johnson', 'student', '1111111111', 'alice.johnson@example.com', 'pass123'),
+('Brian Smith', 'student', '1111111112', 'brian.smith@example.com', 'pass123'),
+('Catherine Lee', 'student', '1111111113', 'catherine.lee@example.com', 'pass123'),
+('David Kim', 'student', '1111111114', 'david.kim@example.com', 'pass123'),
+('Emily Davis', 'student', '1111111115', 'emily.davis@example.com', 'pass123'),
+
+-- Oak Hall
+('Frank Moore', 'student', '2222222221', 'frank.moore@example.com', 'pass123'),
+('Grace Allen', 'student', '2222222222', 'grace.allen@example.com', 'pass123'),
+('Henry Wright', 'student', '2222222223', 'henry.wright@example.com', 'pass123'),
+('Isabella Clark', 'student', '2222222224', 'isabella.clark@example.com', 'pass123'),
+('Jack Miller', 'student', '2222222225', 'jack.miller@example.com', 'pass123'),
+
+-- Pine Hall
+('Karen Hall', 'student', '3333333331', 'karen.hall@example.com', 'pass123'),
+('Leo Young', 'student', '3333333332', 'leo.young@example.com', 'pass123'),
+('Mia Hernandez', 'student', '3333333333', 'mia.hernandez@example.com', 'pass123'),
+('Nathan Scott', 'student', '3333333334', 'nathan.scott@example.com', 'pass123'),
+('Olivia Adams', 'student', '3333333335', 'olivia.adams@example.com', 'pass123');
+
+
+-- Maple Hall: UserID 2–6, RoomID 1–5
+INSERT INTO Registrations (UserID, RoomID, StartDate, EndDate, AdminID) VALUES
+(2, 1, '2025-06-01', '2025-12-01', 1),
+(3, 2, '2025-06-01', '2025-12-01', 1),
+(4, 3, '2025-06-01', '2025-12-01', 1),
+(5, 4, '2025-06-01', '2025-12-01', 1),
+(6, 5, '2025-06-01', '2025-12-01', 1);
+
+-- Oak Hall: UserID 7–11, RoomID 11–15
+INSERT INTO Registrations (UserID, RoomID, StartDate, EndDate, AdminID) VALUES
+(7, 11, '2025-06-01', '2025-12-01', 1),
+(8, 12, '2025-06-01', '2025-12-01', 1),
+(9, 13, '2025-06-01', '2025-12-01', 1),
+(10, 14, '2025-06-01', '2025-12-01', 1),
+(11, 15, '2025-06-01', '2025-12-01', 1);
+
+-- Pine Hall: UserID 12–16, RoomID 21–25
+INSERT INTO Registrations (UserID, RoomID, StartDate, EndDate, AdminID) VALUES
+(12, 21, '2025-06-01', '2025-12-01', 1),
+(13, 22, '2025-06-01', '2025-12-01', 1),
+(14, 23, '2025-06-01', '2025-12-01', 1),
+(15, 24, '2025-06-01', '2025-12-01', 1),
+(16, 25, '2025-06-01', '2025-12-01', 1);
+
+
+
+
+select * from MaintenanceRequests;
+
+
+INSERT INTO MaintenanceRequests (
+    RoomID, 
+    UserID, 
+    RequestDetails, 
+    Date, 
+    Status, 
+    DateFixed
+) VALUES (
+    2,                -- Room assigned to UserID 3
+    3,                -- UserID making the request
+    'Air conditioner not working', 
+    NOW(),            -- Current date/time
+    'not_fixed', 
+    NULL              -- Not fixed yet
+);
+
+
+INSERT INTO MaintenanceLogs (
+    RequestID, 
+    FixDetails, 
+    Date
+) VALUES (
+    1, 
+    'Replaced faulty capacitor in AC unit', 
+    NOW()
+);
+
+
+show  tables from dormitory;
 
 select * from users;
+
 select * from registrations;
-
-
-
-
-
-
-
 
 

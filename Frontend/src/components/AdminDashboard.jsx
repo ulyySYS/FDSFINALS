@@ -8,8 +8,7 @@ import MaintenanceLogForm from './AdminMaintenanceLogForm';
 import RegistrationForm from './RegistrationForm';
 import RegistrationsList from './RegistrationsList';
 import PaymentForm from './PaymentForm';
-import RoomsList from './RoomsList';
-import RoomDetails from './RoomDetails';
+
 
 const AdminDashboard = () => {
   const { currentUser } = useAuth();
@@ -26,11 +25,6 @@ const AdminDashboard = () => {
   const [isLoadingRegistrations, setIsLoadingRegistrations] = useState(false);
   const [registrationsError, setRegistrationsError] = useState(null);
 
-  // Rooms-related state
-  const [rooms, setRooms] = useState([]);
-  const [selectedRoom, setSelectedRoom] = useState(null);
-  const [isLoadingRooms, setIsLoadingRooms] = useState(false);
-  const [roomsError, setRoomsError] = useState(null);
 
   //  state for user registrations combined view
   const [userRegistrations, setUserRegistrations] = useState([]);
@@ -58,8 +52,6 @@ const AdminDashboard = () => {
       fetchMaintenanceRequests();
     } else if (activeView === 'payments') {
       fetchRegistrations();
-    } else if (activeView === 'rooms') {
-      fetchRooms();
     } else if (activeView === 'userRegistration') {
       fetchUserRegistrations();
     } else if (activeView === 'allPayments') {
@@ -79,7 +71,7 @@ const AdminDashboard = () => {
     setUserRegistrationsError(null);
     
     try {
-      const response = await fetch('http://localhost:8000/admin/all-registrations');
+      const response = await fetch('http://localhost:3000/admin/all-registrations');
       
       if (!response.ok) {
         throw new Error('Failed to fetch user registrations');
@@ -101,7 +93,7 @@ const AdminDashboard = () => {
     setPaymentsError(null);
     
     try {
-      const response = await fetch('http://localhost:8000/admin/all-payments');
+      const response = await fetch('http://localhost:3000/admin/all-payments');
       
       if (!response.ok) {
         throw new Error('Failed to fetch payments');
@@ -123,7 +115,7 @@ const AdminDashboard = () => {
     setLogsError(null);
     
     try {
-      const response = await fetch('http://localhost:8000/admin/view-maintenance-logs');
+      const response = await fetch('http://localhost:3000/admin/view-maintenance-logs');
       
       if (!response.ok) {
         throw new Error('Failed to fetch maintenance logs');
@@ -145,7 +137,7 @@ const AdminDashboard = () => {
     setBuildingsError(null);
     
     try {
-      const response = await fetch('http://localhost:8000/admin/all-buildings');
+      const response = await fetch('http://localhost:3000/admin/all-buildings');
       
       if (!response.ok) {
         throw new Error('Failed to fetch buildings');
@@ -167,7 +159,7 @@ const AdminDashboard = () => {
     setError(null);
     
     try {
-      const response = await fetch('http://localhost:8000/admin/view-maintenance-requests');
+      const response = await fetch('http://localhost:3000/admin/view-maintenance-requests');
       
       if (!response.ok) {
         throw new Error('Failed to fetch maintenance requests');
@@ -188,7 +180,7 @@ const AdminDashboard = () => {
     setIsLoadingRegistrations(true);
     setRegistrationsError(null);
     try {
-      const response = await fetch('http://localhost:8000/admin/all-registrations');
+      const response = await fetch('http://localhost:3000/admin/all-registrations');
       
       if (!response.ok) {
         throw new Error('Failed to fetch registrations');
@@ -204,26 +196,6 @@ const AdminDashboard = () => {
     }
   };
 
-  // Function to fetch rooms
-  const fetchRooms = async () => {
-    setIsLoadingRooms(true);
-    setRoomsError(null);
-    try {
-      const response = await fetch('http://localhost:8000/admin/all-rooms');
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch rooms');
-      }
-      
-      const data = await response.json();
-      setRooms(data.rooms || []);
-    } catch (err) {
-      setRoomsError('Error fetching rooms: ' + err.message);
-      console.error('Error fetching rooms:', err);
-    } finally {
-      setIsLoadingRooms(false);
-    }
-  };
 
   // Handle request selection
   const handleRequestSelect = (request) => {
@@ -236,10 +208,7 @@ const AdminDashboard = () => {
     setSelectedRegistration(registration);
   };
 
-  // Handle room selection
-  const handleRoomSelect = (room) => {
-    setSelectedRoom(room);
-  };
+
 
   // Handle form submission success
   const handleRequestSubmitted = () => {
@@ -261,16 +230,7 @@ const AdminDashboard = () => {
   };
 
   // Handle room update success
-  const handleRoomUpdateSuccess = () => {
-    fetchRooms();
-    // Keep the same room selected but refresh its data
-    if (selectedRoom) {
-      const updatedRoom = rooms.find(room => room.RoomID === selectedRoom.RoomID);
-      if (updatedRoom) {
-        setSelectedRoom({ ...updatedRoom, isOperational: !updatedRoom.isOperational });
-      }
-    }
-  };
+
 
   // Handle closing the log form
   const handleCloseLogForm = () => {
@@ -428,35 +388,6 @@ const AdminDashboard = () => {
                   currentUser={currentUser}
                   selectedRegistration={selectedRegistration}
                   onPaymentSubmitted={handlePaymentSubmitted}
-                />
-              </div>
-            </div>
-          </>
-        ) : activeView === 'rooms' ? (
-          // Rooms View
-          <>
-            <h3 className="dashboard-title">Room Management</h3>
-            <div className="rooms-container">
-              {/* List of rooms on the left */}
-              <div className="rooms-list-container">
-                {isLoadingRooms ? (
-                  <p className="rooms-loading-text">Loading rooms...</p>
-                ) : roomsError ? (
-                  <p className="rooms-error-text">{roomsError}</p>
-                ) : (
-                  <RoomsList 
-                    rooms={rooms}
-                    selectedRoom={selectedRoom}
-                    onSelectRoom={handleRoomSelect}
-                  />
-                )}
-              </div>
-              
-              {/* Room details on the right */}
-              <div className="rooms-details-container">
-                <RoomDetails 
-                  selectedRoom={selectedRoom}
-                  onUpdateSuccess={handleRoomUpdateSuccess}
                 />
               </div>
             </div>
@@ -638,7 +569,7 @@ const AdminDashboard = () => {
                           <td>{request.RoomName}</td>
                           <td>{request.UserID}</td>
                           <td>{request.Username}</td>
-                          <td>{request.Issue}</td>
+                          <td>{request.RequestDetails}</td>
                           <td>
                             <span className={`table-data-status table-data-status-${request.Status.toLowerCase()}`}>
                               {request.Status}

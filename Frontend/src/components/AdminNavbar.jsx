@@ -6,7 +6,6 @@ const AdminNavbar = ({
   onMaintenanceRequestClick, 
   onRegistrationClick, 
   onPaymentsClick,
-  onRoomsClick 
 }) => {
   const { logout, currentUser } = useAuth();
 
@@ -26,9 +25,6 @@ const AdminNavbar = ({
           </button>
           <button onClick={onPaymentsClick} className="navbar-btn">
             Payments
-          </button>
-          <button onClick={onRoomsClick} className="navbar-btn">
-            Rooms
           </button>
         </div>
       </div>

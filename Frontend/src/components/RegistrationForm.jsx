@@ -35,7 +35,7 @@ const RegistrationForm = ({ currentUser }) => {
     setSqlError(null);
 
     try {
-      const response = await fetch('http://localhost:8000/admin/all-rooms');
+      const response = await fetch('http://localhost:3000/admin/all-rooms');
       
       if (!response.ok) {
         throw new Error('Failed to fetch rooms');
@@ -82,7 +82,7 @@ const RegistrationForm = ({ currentUser }) => {
       };
       console.log('Sending user payload:', userPayload);
       
-      const createUserResponse = await fetch('http://localhost:8000/admin/add-user', {
+      const createUserResponse = await fetch('http://localhost:3000/admin/add-user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -135,12 +135,11 @@ const RegistrationForm = ({ currentUser }) => {
         RoomID: formData.roomId,
         StartDate: formData.startDate,
         EndDate: formData.endDate,
-        AdminID: currentUser?.UserID || 1 // Fallback to admin ID 1 if currentUser is not available
       };
       
       console.log('Sending registration payload:', registrationPayload);
       
-      const addRegistrationResponse = await fetch('http://localhost:8000/admin/add-registration', {
+      const addRegistrationResponse = await fetch('http://localhost:3000/admin/add-registration', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -201,9 +200,9 @@ const RegistrationForm = ({ currentUser }) => {
             <table className="registration-rooms-table">
               <thead>
                 <tr>
+                  <th>Dorm Building ID</th>
                   <th>Room ID</th>
-                  <th>Room Name</th>
-                  <th>Capacity</th>
+                  <th>Occupied</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -214,10 +213,9 @@ const RegistrationForm = ({ currentUser }) => {
                     className={formData.roomId === room.RoomID.toString() ? 'registration-selected-room' : ''}
                     onClick={() => setFormData({...formData, roomId: room.RoomID.toString()})}
                   >
+                    <td>{room.DormBuildingID}</td>
                     <td>{room.RoomID}</td>
-                    <td>{room.RoomName}</td>
-                    <td>{room.Capacity}</td>
-                    <td>{room.isOperational ? 'Operational' : 'Not Operational'}</td>
+                    <td>{!room.Occupied ? 'Not Occupied' : 'Occupied'}</td>
                   </tr>
                 ))}
               </tbody>

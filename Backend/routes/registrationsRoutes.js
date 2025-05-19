@@ -1,25 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const database = require('../config/database');
-const getUserName = require('../services/getUserName');
-const getEmail = require('../services/getUserEmail');
-const getContactNumber = require('../services/getUserContactNumber');
-const getDateFormat = require('../services/getDateFormat');
  
 
 // add registration
 // -> /admin/add-registration
 router.post('/add-registration', async (req, res) => {
-    const { UserID, RoomID, StartDate, EndDate, AdminID } = req.body;
-  if (!UserID || !RoomID || !StartDate || !EndDate || !AdminID) {
+    const { UserID, RoomID, StartDate, EndDate } = req.body;
+  if (!UserID || !RoomID || !StartDate || !EndDate) {
     return res.status(400).json({ message: 'Missing required fields.' });
   }
 
   try {
     const [result] = await database.query(
-      `INSERT INTO Registrations (UserID, RoomID, StartDate, EndDate, AdminID)
-       VALUES (?, ?, ?, ?, ?)`,
-      [UserID, RoomID, StartDate, EndDate, AdminID]
+      `INSERT INTO Registrations (UserID, RoomID, StartDate, EndDate)
+       VALUES (?, ?, ?, ?)`,
+      [UserID, RoomID, StartDate, EndDate]
     );
 
     res.status(201).json({ message: 'Registration added.'});
@@ -39,16 +35,34 @@ router.get('/all-registrations', async (req, res) => {
             `SELECT * FROM Registrations`
         )
         for(let i = 0; i < registrations.length; i++) {
+
+
+            const [username] = await database.query(
+            `SELECT UserName FROM Users WHERE UserID = ?`,
+            [registrations[i].UserID]
+            );
+
+            const [contactNumber] = await database.query(
+            `SELECT ContactNumber FROM Users WHERE UserID = ?`,
+            [registrations[i].UserID]
+            );
+
+            const [email] = await database.query(
+            `SELECT Email FROM Users WHERE UserID = ?`,
+            [registrations[i].UserID]
+            );
+
             let items = {
-                RegistrationID: registrations[i].RegistrationID,
+                RegistrationID: registrations[i].RegisID,
                 UserID: registrations[i].UserID,
                 RoomID: registrations[i].RoomID,
                 StartDate: registrations[i].StartDate,
                 EndDate: registrations[i].EndDate,
                 AdminID: registrations[i].AdminID,
-                UserName: await getUserName(registrations[i].UserID),
-                ContactNumber: await getContactNumber(registrations[i].UserID),
-                Email: await getEmail(registrations[i].UserID)
+                UserName: username[0].UserName,
+                ContactNumber: contactNumber[0].ContactNumber,
+                // Assuming you have a function to get the email    
+                Email: email[0].Email,
             }
             allRegistrations.push(items);
         }

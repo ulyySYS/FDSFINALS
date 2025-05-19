@@ -7,7 +7,6 @@ const database = require('../config/database');
 // -> /admin/add-user
 router.post('/add-user', async (req, res) => {
     const { username, role, ContactNumber, Email, Password } = req.body;
-    console.log("Received user data:", { username, role, ContactNumber, Email, Password: "******" });
 
     try {
 

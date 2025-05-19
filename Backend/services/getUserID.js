@@ -6,7 +6,7 @@ const getUserID = async (registrationID) => {
         const [rows] = await database.query(
             `SELECT UserID 
              FROM Registrations 
-             WHERE RegistrationID = ?`,
+             WHERE RegisID = ?`,
             [registrationID]
         );
         if (rows.length > 0) {

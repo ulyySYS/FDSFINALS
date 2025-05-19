@@ -16,7 +16,7 @@ const MaintenanceRequestForm = () => {
     setError(null);
     
     try {
-      const response = await fetch(`http://localhost:8000/users/all-user-requests/${currentUser.UserID}`);
+      const response = await fetch(`http://localhost:3000/users/all-user-requests/${currentUser.UserID}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch maintenance requests');
@@ -25,8 +25,8 @@ const MaintenanceRequestForm = () => {
       const data = await response.json();
       setUserRequests(data.requests || []);
     } catch (err) {
-      setError('Unable to load maintenance requests. Please try again later.');
-      console.error('Error fetching maintenance requests:', err);
+      setError('Unable to load maintenance requests. Please try again later.', err);
+
     } finally {
       setIsLoading(false);
     }
@@ -51,13 +51,13 @@ const MaintenanceRequestForm = () => {
     setSubmitMessage({ text: '', isError: false });
     console.log(currentUser)
     try {
-      const response = await fetch('http://localhost:8000/users/request', {
+      const response = await fetch('http://localhost:3000/users/request', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          issue: issue,
+          RequestDetails: issue,
           UserID: currentUser.UserID
         }),
       });
@@ -171,7 +171,7 @@ const MaintenanceRequestForm = () => {
                   </span>
                   <span className="request-date">{formatDate(request.Date)}</span>
                 </div>
-                <div className="request-issue">{request.Issue}</div>
+                <div className="request-issue">{request.RequestDetails}</div>
               </div>
             ))}
           </div>

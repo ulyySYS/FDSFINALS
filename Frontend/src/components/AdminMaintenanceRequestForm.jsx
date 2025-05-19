@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 const AdminMaintenanceRequestForm = ({ currentUser, onRequestSubmitted }) => {
-  const [issue, setIssue] = useState('');
+  const [RequestDetails, setRequestDetails] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
@@ -9,7 +9,7 @@ const AdminMaintenanceRequestForm = ({ currentUser, onRequestSubmitted }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!issue.trim()) {
+    if (!RequestDetails.trim()) {
       setError('Please describe the issue');
       return;
     }
@@ -19,14 +19,13 @@ const AdminMaintenanceRequestForm = ({ currentUser, onRequestSubmitted }) => {
     setSuccess(null);
     
     try {
-      console.log( "kskdnindknds", currentUser);
-      const response = await fetch('http://localhost:8000/users/request', {
+      const response = await fetch('http://localhost:3000/users/request', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          issue,
+          RequestDetails,
           UserID: currentUser.UserID, 
         }),
       });
@@ -37,7 +36,7 @@ const AdminMaintenanceRequestForm = ({ currentUser, onRequestSubmitted }) => {
       
       const data = await response.json();
       setSuccess(data.message || 'Request Sent and logged');
-      setIssue(''); // Clear form
+      setRequestDetails(''); // Clear form
       
       if (onRequestSubmitted) {
         onRequestSubmitted();
@@ -73,8 +72,8 @@ const AdminMaintenanceRequestForm = ({ currentUser, onRequestSubmitted }) => {
             id="issue" 
             className="request-form-control issue-textarea textarea"
             rows="6"
-            value={issue}
-            onChange={(e) => setIssue(e.target.value)}
+            value={RequestDetails}
+            onChange={(e) => setRequestDetails(e.target.value)}
             placeholder="Please describe the maintenance issue in detail"
             required
           ></textarea>

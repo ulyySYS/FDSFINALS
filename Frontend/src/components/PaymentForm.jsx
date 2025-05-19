@@ -49,7 +49,7 @@ const PaymentForm = ({ currentUser, selectedRegistration, onPaymentSubmitted }) 
     setSubmitError(null);
 
     try {
-      const response = await fetch('http://localhost:8000/admin/create-payment', {
+      const response = await fetch('http://localhost:3000/admin/create-payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

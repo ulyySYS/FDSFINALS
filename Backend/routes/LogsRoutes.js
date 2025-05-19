@@ -8,20 +8,18 @@ const database = require('../config/database');
 // only for admins
 // -> /admin/add-maintenance-log
 router.post('/add-maintenance-log', async (req, res) => {
-    const {  requestId, LogDescription } = req.body;
+    const {  requestId, FixDetails } = req.body;
 
     
     try {
         const [insert] = await database.query(
-            `INSERT INTO MaintenanceLogs (RequestID, RepairDescription) VALUES (?, ?)`,
-            [requestId, LogDescription]
+            `INSERT INTO MaintenanceLogs (RequestID, FixDetails) VALUES (?, ?)`,
+            [requestId, FixDetails]
         )
         res.status(200).json({message: 'Repair log sent'});
 
     } catch(err) {
-        console.log("error: aDSADSAFASASSDASDAS")
-        console.log("eroar: , ", err.sqlMessage)
-        console.log("error: 222222222222222222")
+
         res.status(500).json({ error: 'Something went wrong with the server', err });
 
     }

@@ -44,14 +44,15 @@ const MaintenanceLogForm = ({ selectedRequest, onLogSubmitted, onClose }) => {
     setSuccess(null);
     
     try {
-      const response = await fetch('http://localhost:8000/admin/add-maintenance-log', {
+      console.log("asfsdfds",selectedRequest);
+      const response = await fetch('http://localhost:3000/admin/add-maintenance-log', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           requestId: selectedRequest.RequestID, 
-          LogDescription: logDescription
+          FixDetails: logDescription
         }),
       });
       

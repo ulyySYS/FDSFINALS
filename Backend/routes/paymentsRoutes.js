@@ -1,9 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const database = require('../config/database');
-const getUserName = require('../services/getUserName');
-const getEmail = require('../services/getUserEmail');
-const getContactNumber = require('../services/getUserContactNumber');
 const getUserID = require('../services/getUserID');
 
 
@@ -11,12 +8,12 @@ const getUserID = require('../services/getUserID');
 // add payment
 // -> /admin/create-payment
 router.post('/create-payment', async (req, res) => {
-    const { registrationID, adminID, amount, paymentDate } = req.body;
+    const { RegisID, amount, Date } = req.body;
 
     try {
         const [insert] = await database.query(
-            `INSERT INTO Payments (RegistrationID, AdminID, PaymentDate, Amount) VALUES (?, ?, ?, ?)`,
-            [registrationID, adminID, paymentDate, amount]
+            `INSERT INTO Payments (RegisID, Date, Amount) VALUES (?, ?, ?)`,
+            [RegisID, Date, amount]
         );
 
 
@@ -38,18 +35,38 @@ router.get('/all-payments', async (req, res) => {
         const [payments] = await database.query(
             `SELECT * FROM Payments`
         )
+
+       
+
+
         for(let i = 0; i < payments.length; i++) {
-            const userID = await getUserID(payments[i].RegistrationID);
-            console.log("userID: ", userID);
+            const userID = await getUserID(payments[i].RegisID);
+
+            const [contactNumber] = await database.query(
+                `SELECT ContactNumber FROM Users WHERE UserID = ?`,
+                [userID]
+            );
+
+            const [email] = await database.query(
+                `SELECT Email FROM Users WHERE UserID = ?`,
+                [userID]
+            );
+
+            const [username] = await database.query(
+                `SELECT UserName FROM Users WHERE UserID = ?`,
+                [userID]
+            );
+
+
             let items = {
                 PaymentID: payments[i].PaymentID,
-                RegistrationID: payments[i].RegistrationID,
+                RegistrationID: payments[i].RegisID,
                 AdminID: payments[i].AdminID,
                 PaymentDate: payments[i].PaymentDate,
                 Amount: payments[i].Amount,
-                UserName: await getUserName(userID),
-                ContactNumber: await getContactNumber(userID),
-                Email: await getEmail(userID)
+                UserName: username[0].UserName,
+                ContactNumber: contactNumber[0].ContactNumber,
+                Email: email[0].Email
             }
             allPayments.push(items);
         }

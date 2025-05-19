@@ -21,7 +21,7 @@ const MaintenanceRequestList = ({ requests, onSelectRequest, selectedRequest }) 
               </div>
               
               <div className="request-details">
-                <p className="request-issue"><strong>Issue:</strong> {request.Issue}</p>
+                <p className="request-issue"><strong>Problem:</strong> {request.RequestDetails}</p>
                 <p className="request-user"><strong>Reported by:</strong> {request.Username}</p>
                 <p className="request-date"><strong>Date:</strong> {new Date(request.Date).toLocaleDateString()}</p>
               </div>

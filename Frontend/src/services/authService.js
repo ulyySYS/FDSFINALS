@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Define base URL for API calls
-const API_URL = 'http://localhost:8000';
+const API_URL = 'http://localhost:3000';
 
 // Login function to authenticate users
 export const loginUser = async (email, password) => {

@@ -1,22 +1,23 @@
 const express = require('express');
 const router = express.Router();
 const database = require('../config/database');
-const getRoomID = require('../services/getRoomID');
-const getRoomName = require('../services/getRoomName');
-const getUserName = require('../services/getUserName');
 
 // add maintenance request
 // -> /users/request
 router.post('/request', async (req, res) => {
-    const {  issue, UserID } = req.body;
-    console.log("user id ipaHIASDHSDOKSNDK",UserID)
-    const roomID =  await getRoomID(UserID);
+    const {  RequestDetails, UserID } = req.body;
+
+    const [RoomID] = await database.query(
+
+        `SELECT RoomID FROM Registrations WHERE UserID = ?`,
+        [UserID]
+    )
 
     
     try {
         const [insert] = await database.query(
-            `INSERT INTO MaintenanceRequests (RoomID, UserID, Issue, Status) VALUES (?, ?, ?, ?)`,
-            [roomID,UserID, issue, "not_fixed"]
+            `INSERT INTO MaintenanceRequests (RoomID, UserID, RequestDetails, Status) VALUES (?, ?, ?, ?)`,
+            [RoomID[0].RoomID,UserID, RequestDetails, "not_fixed"]
         )
         res.status(200).json({message: 'Request Sent and logged'});
 
@@ -34,7 +35,7 @@ router.get('/all-user-requests/:UserID', async (req, res) => {
     
     try {
         const [requests] = await database.query(
-            `SELECT Issue, Date, Status
+            `SELECT RequestDetails, Date, Status
              FROM MaintenanceRequests
              WHERE UserID = ?
              ORDER BY Date DESC`,
@@ -62,17 +63,33 @@ router.get('/view-maintenance-requests',async(req,res) =>{
         )
 
         for (let i = 0; i < logs.length; i++) {
+
+            const [rows] = await database.query(
+                `SELECT UserName FROM Users WHERE UserID = ?`,
+                [logs[i].UserID]
+            );
+
+            const [DormNameResult] = await database.query(
+                `SELECT d.Name AS DormName
+                 FROM DormRooms r
+                 JOIN Dorms d ON r.DormBuildingID = d.DormID
+                 WHERE r.RoomID = ?`,
+                [logs[i].RoomID]
+                );
+            
             let items = {
-                RequestID: logs[i].RequestId,
+                RequestID: logs[i].RequestID,
                 RoomID: logs[i].RoomID,
                 UserID: logs[i].UserID,
-                Issue: logs[i].Issue,
+                RequestDetails: logs[i].RequestDetails,
                 Status: logs[i].Status,
                 Date: logs[i].Date,
-                RoomName: await getRoomName(logs[i].RoomID),
-                Username: await getUserName(logs[i].UserID),
+                Username: rows[0].UserName,
+                DormBuildingName: DormNameResult[0].DormName
+
             };
             requests.push(items);
+            console.log("reqs: asfdf",requests)
         }
 
         res.status(200).json({message: 'requests fetched', requests});

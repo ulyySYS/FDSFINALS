@@ -8,7 +8,7 @@ const database = require('../config/database');
 router.get('/all-buildings', async (req, res) => {
     try {
         const [buildings] = await database.query(
-            `SELECT * FROM DormBuildings`
+            `SELECT * FROM Dorms`
         )
         res.status(200).json({message: 'rooms fetched', buildings});
 
